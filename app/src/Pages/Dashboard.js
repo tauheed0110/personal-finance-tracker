@@ -8,6 +8,7 @@ import { addDoc, collection, getDoc, getDocs, query } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import { toast } from 'react-toastify';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import TransactionTable from '../component/TransactionTable';
 
 const Dashboard = () => {
   const [transactions, setTransactions] = useState([]);
@@ -34,7 +35,7 @@ const Dashboard = () => {
   function onFinish(values, type) {
     const newTransaction = {
       type: type,
-      date: moment(values.date).format('YYYY-MM-DD'),
+      date: values.date.format('YYYY-MM-DD'),
       amount: Math.floor(values.amount),
       tag: values.tag,
       name: values.name
@@ -61,7 +62,7 @@ const Dashboard = () => {
   }
   useEffect(() => {
     fetchTransactions();
-  }, [])
+  }, [user])
 
   useEffect(()=>{
     calculateBalance();
@@ -128,6 +129,7 @@ const Dashboard = () => {
               isIncomeModalVisible={isIncomeModalVisible}
               hadleIncomeCancel={hadleIncomeCancel}
               onFinish={onFinish} />
+            <TransactionTable transactions={transactions}/>
           </>
       }
     </div>
