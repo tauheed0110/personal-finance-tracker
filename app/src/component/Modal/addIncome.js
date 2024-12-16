@@ -72,7 +72,7 @@ function AddIncomeModal({
                     </Select>
                 </Form.Item>
                 <Form.Item>
-                    <Button className='btn blue-btn' type='primary' htmlType='submit'>
+                    <Button className='btn blue-btn' type='primary' htmlType='submit' onClick={hadleIncomeCancel}>
                         Add Income
                     </Button>
                 </Form.Item>

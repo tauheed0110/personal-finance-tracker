@@ -1,7 +1,14 @@
 import { Radio, Select, Table } from 'antd';
 import React, { useState } from 'react';
 import searchImg from '../../assets/searchImg.svg';
-function TransactionTable({ transactions }) {
+import Papa, { parse } from 'papaparse'
+import {toast} from 'react-toastify';
+
+function TransactionTable({ 
+    transactions,
+    addTransaction, 
+    fetchTransactions
+ }) {
     const [search, setSeacrh] = useState("");
     const [filterType, setFilterType] = useState("");
     const [sortKey, setSortKey] = useState("");
@@ -42,6 +49,47 @@ function TransactionTable({ transactions }) {
             return a.amount - b.amount;
         } else return 0;
     })
+    // function to export csv file
+    function exportCSV() {
+        var csv = Papa.unparse({
+            fields: ["name", "type", "tag", "date", "amount"],
+            data: transactions
+        });
+        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        var url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'transactions.csv';
+        document.body.appendChild(link); 
+        link.click();
+        document.body.removeChild(link);
+    }
+    // writing function import from csv
+    async function importCSV(event){
+        event.preventDefault();
+        try{
+            parse(event.target.files[0], {
+                header: true,
+                complete: async function (results){
+                    for(const transaction of results.data){
+                        const {name, type, tag, date, amount} = transaction;
+                        if(name && type && tag && date && amount){
+                            const newTransaction = {
+                                ...transaction, amount: parseFloat(transaction.amount)
+                            }
+                            console.log(newTransaction);
+                            await addTransaction(newTransaction, true);
+                        }
+                    }
+                }
+            });
+            toast.success('All transactions added');
+            fetchTransactions();
+            event.target.files=null;
+        }catch(e){
+            toast.error(e.message)
+        }
+    }
     return (
         <div className='my-table'>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem", gap: "1rem" }}>
@@ -72,9 +120,9 @@ function TransactionTable({ transactions }) {
                 </Radio.Group>
                 <div
                     style={{ display: "flex", justifyContent: "center", gap: "1rem", width: "400px" }}>
-                    <button className='btn'>Export to CSV</button>
+                    <button className='btn' onClick={exportCSV}>Export to CSV</button>
                     <label htmlFor='file-svg' className='btn blue-btn'>Import to CSV</label>
-                    <input id='file-svg' type='file' accept='.csv' required style={{ display: 'none' }} />
+                    <input onChange={importCSV} id='file-svg' type='file' accept='.csv' required style={{ display: 'none' }} />
                 </div>
             </div>
             <Table dataSource={sortedTransaction} columns={columns} />;

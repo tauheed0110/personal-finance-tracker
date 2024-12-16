@@ -5,3 +5,9 @@
   justify-content: center;
   align-items: center;
 }
+
+.chart{
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  border-radius: 0.5rem;
+}

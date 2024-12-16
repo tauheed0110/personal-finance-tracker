@@ -1,0 +1,84 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 200 200"
+  width="200"
+  height="200"
+>
+  <!-- Outer Circle -->
+  <circle
+    cx="100"
+    cy="100"
+    r="90"
+    fill="none"
+    stroke="#ccc"
+    stroke-width="2"
+  />
+
+  <!-- Wallet Icon -->
+  <rect
+    x="55"
+    y="80"
+    width="90"
+    height="50"
+    rx="8"
+    fill="none"
+    stroke="#000"
+    stroke-width="2"
+  />
+  <path
+    d="M55 80 L100 60 L145 80"
+    fill="none"
+    stroke="#000"
+    stroke-width="2"
+  />
+
+  <!-- Empty Wallet Lines -->
+  <line
+    x1="65"
+    y1="95"
+    x2="135"
+    y2="95"
+    stroke="#999"
+    stroke-width="1"
+    stroke-dasharray="4"
+  />
+  <line
+    x1="65"
+    y1="105"
+    x2="135"
+    y2="105"
+    stroke="#999"
+    stroke-width="1"
+    stroke-dasharray="4"
+  />
+
+  <!-- Placeholder Coins -->
+  <circle
+    cx="140"
+    cy="65"
+    r="8"
+    fill="none"
+    stroke="#ccc"
+    stroke-width="2"
+  />
+  <circle
+    cx="60"
+    cy="65"
+    r="8"
+    fill="none"
+    stroke="#ccc"
+    stroke-width="2"
+  />
+
+  <!-- Text -->
+  <text
+    x="100"
+    y="160"
+    font-family="Arial, sans-serif"
+    font-size="12"
+    text-anchor="middle"
+    fill="#888"
+  >
+    No Transactions Found
+  </text>
+</svg>

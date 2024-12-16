@@ -9,6 +9,8 @@ import { auth, db } from '../firebase';
 import { toast } from 'react-toastify';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import TransactionTable from '../component/TransactionTable';
+import Chart from '../component/Chart';
+import NoTransactions from '../component/NoTransactions';
 
 const Dashboard = () => {
   const [transactions, setTransactions] = useState([]);
@@ -40,10 +42,10 @@ const Dashboard = () => {
       tag: values.tag,
       name: values.name
     }
-    addTransaction(newTransaction)
+    addTransaction(newTransaction, true)
   }
 
-  async function addTransaction(transaction) {
+  async function addTransaction(transaction, many) {
     // add the transaction to firebase
     try {
       const docRef = await addDoc(
@@ -51,12 +53,12 @@ const Dashboard = () => {
         transaction
       );
       console.log("Document written with ID", docRef.id);
-      toast.success('Transacton added');
+      if(!many) toast.success('Transacton added');
       // set the transactions again so that it calculates balance again
       setTransactions([...transactions, transaction]);
     } catch (e) {
       console.log("Error adding document", e);
-      toast.error("Couldn't add Transaction")
+      if(!many) toast.error("Couldn't add Transaction")
 
     }
   }
@@ -107,6 +109,9 @@ const Dashboard = () => {
     setCurrentBalance(incomeTotal - expenseTotal);
 
   }
+  let sortedTransaction = [...transactions].sort((a, b) => {
+        return new Date(a.date) - new Date(b.date);
+  });
   return (
     <div>
       <Header />
@@ -120,6 +125,8 @@ const Dashboard = () => {
             showExpenseModal={showExpenseModal} 
             showIncomeModal={showIncomeModal} />
 
+            {transactions.length > 0 ? <Chart sortedTransaction={sortedTransaction}/>: <NoTransactions />}
+
             <AddExpenseModal
               isExpenseModalVisible={isExpenseModalVisible}
               hadleExpenseCancel={hadleExpenseCancel}
@@ -129,7 +136,7 @@ const Dashboard = () => {
               isIncomeModalVisible={isIncomeModalVisible}
               hadleIncomeCancel={hadleIncomeCancel}
               onFinish={onFinish} />
-            <TransactionTable transactions={transactions}/>
+            <TransactionTable transactions={transactions} addTransaction={addTransaction} fetchTransactions={fetchTransactions}/>
           </>
       }
     </div>

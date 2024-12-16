@@ -14,12 +14,13 @@ const SignupSignin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loadingEmailState, setLoadingEmailState] = useState(false);
+  const [loadingGoogleState, setLoadingGoogleState] = useState(false);
   const [loginForm, setLoginForm] = useState(false);
 
   function handleSignUpWithEmail(e) {
     e.preventDefault();
-    setLoading(true);
+    setLoadingEmailState(true);
     if (name.trim() && email && password && confirmPassword) {
       if (password == confirmPassword) {
         createUserWithEmailAndPassword(auth, email, password)
@@ -27,7 +28,7 @@ const SignupSignin = () => {
             // Signed up 
             const user = userCredential.user;
             toast.success('user created successfully');
-            setLoading(false);
+            setLoadingEmailState(false);
             setName('');
             setEmail('');
             setPassword('');
@@ -39,27 +40,27 @@ const SignupSignin = () => {
             const errorCode = error.code;
             const errorMessage = error.message;
             toast.error(errorMessage)
-            setLoading(false);
+            setLoadingEmailState(false);
           });
       } else {
         toast.error("Password and Confirm Password don't macth");
-        setLoading(false);
+        setLoadingEmailState(false);
       }
     } else {
       toast.error('All* fields are mandatory');
-      setLoading(false);
+      setLoadingEmailState(false);
     }
   }
   function handleLogin(e) {
     e.preventDefault();
-    setLoading(true);
+    setLoadingEmailState(true);
     if (email && password) {
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           // Signed in 
           const user = userCredential.user;
           toast.success('user login successful')
-          setLoading(false);
+          setLoadingEmailState(false);
           setEmail('')
           setPassword('');
           navigate('/dashboard');
@@ -68,16 +69,16 @@ const SignupSignin = () => {
           const errorCode = error.code;
           const errorMessage = error.message;
           toast.success(errorMessage)
-          setLoading(false);
+          setLoadingEmailState(false);
         });
     } else {
       toast.error('All* fields are mandatory');
-      setLoading(false);
+      setLoadingEmailState(false);
     }
   }
 
   async function createDoc(user) {
-    setLoading(true);
+    setLoadingEmailState(true);
     if (!user) return
     const useRef = doc(db, 'users', user.uid);
     try {
@@ -90,14 +91,14 @@ const SignupSignin = () => {
           createdAt: new Date()
         });
         toast.success('Doc created');
-        setLoading(false);
+        setLoadingEmailState(false);
       }else{
         toast.error("Doc already exists");
-        setLoading(false);
+        setLoadingEmailState(false);
       }
     } catch (e) {
       toast.error(e.message);
-      setLoading(false);
+      setLoadingEmailState(false);
     }
   }
   return (
@@ -120,10 +121,10 @@ const SignupSignin = () => {
               state={password}
               setState={setPassword}
             />
-            <Button disabled={loading} text={loading ? 'Loading...' : 'Login Using Email and Password'} onClick={(e) => { handleLogin(e) }} />
+            <Button disabled={loadingEmailState} text={loadingEmailState ? 'Loading...' : 'Login Using Email and Password'} onClick={(e) => { handleLogin(e) }} />
             <p style={{ textAlign: 'center' }}>or</p>
-            <Button disabled={loading} text={loading ? 'Loading...' : 'Login Using Google'} blue={true} />
-            <p disabled={loading} className='p-login' onClick={() => { setLoginForm(!loginForm) }}>Or Don't Have An Account? <span style={{ color: 'var(--theme)' }}>Click Here</span></p>
+            <Button disabled={loadingGoogleState} text={loadingGoogleState ? 'Loading...' : 'Login Using Google'} blue={true} />
+            <p disabled={loadingGoogleState || loadingEmailState} className='p-login' onClick={() => { setLoginForm(!loginForm) }}>Or Don't Have An Account? <span style={{ color: 'var(--theme)' }}>Click Here</span></p>
           </form>
         </div>
       ) : (
@@ -158,10 +159,10 @@ const SignupSignin = () => {
               state={confirmPassword}
               setState={setConfirmPassword}
             />
-            <Button disabled={loading} text={loading ? 'Loading...' : 'Signup Using Email and Password'} onClick={(e) => { handleSignUpWithEmail(e) }} />
+            <Button disabled={loadingEmailState} text={loadingEmailState ? 'Loading...' : 'Signup Using Email and Password'} onClick={(e) => { handleSignUpWithEmail(e) }} />
             <p style={{ textAlign: 'center' }}>or</p>
-            <Button disabled={loading} text={loading ? 'Loading...' : 'Signup Using Google'} blue={true} />
-            <p disabled={loading} className='p-login' onClick={() => { setLoginForm(!loginForm) }}>Or Already Have An Account? <span style={{ color: 'var(--theme)' }}>Click Here</span></p>
+            <Button disabled={loadingGoogleState} text={loadingGoogleState ? 'Loading...' : 'Signup Using Google'} blue={true} />
+            <p disabled={loadingGoogleState || loadingEmailState} className='p-login' onClick={() => { setLoginForm(!loginForm) }}>Or Already Have An Account? <span style={{ color: 'var(--theme)' }}>Click Here</span></p>
           </form>
         </div>
       )}
