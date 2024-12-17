@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import searchImg from '../../assets/searchImg.svg';
 import Papa, { parse } from 'papaparse'
 import {toast} from 'react-toastify';
+import './styles.css';
 
 function TransactionTable({ 
     transactions,
@@ -108,7 +109,7 @@ function TransactionTable({
                     <Select.Option value='expense'>Expenses</Select.Option>
                 </Select>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
+            <div className='table-flex-row'>
                 <h2>My Transactions</h2>
                 <Radio.Group
                     className='input-radio'
@@ -119,7 +120,7 @@ function TransactionTable({
                     <Radio.Button value={"amount"}>Sort By Ammount</Radio.Button>
                 </Radio.Group>
                 <div
-                    style={{ display: "flex", justifyContent: "center", gap: "1rem", width: "400px" }}>
+                    className='export-import-btn'>
                     <button className='btn' onClick={exportCSV}>Export to CSV</button>
                     <label htmlFor='file-svg' className='btn blue-btn'>Import to CSV</label>
                     <input onChange={importCSV} id='file-svg' type='file' accept='.csv' required style={{ display: 'none' }} />

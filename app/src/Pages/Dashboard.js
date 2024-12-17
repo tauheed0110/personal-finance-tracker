@@ -11,10 +11,12 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import TransactionTable from '../component/TransactionTable';
 import Chart from '../component/Chart';
 import NoTransactions from '../component/NoTransactions';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-  const [transactions, setTransactions] = useState([]);
+  const navigate = useNavigate()
   const [user] = useAuthState(auth);
+  const [transactions, setTransactions] = useState([]);
   const [isExpenseModalVisible, setIsExpenseModalVisible] = useState(false);
   const [isIncomeModalVisible, setIsIncomeModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -62,6 +64,12 @@ const Dashboard = () => {
 
     }
   }
+  // if user os not logged in navigate to signup page
+  useEffect(()=>{
+    if(!user){
+      navigate('/');
+    }
+  },[])
   useEffect(() => {
     fetchTransactions();
   }, [user])
@@ -116,14 +124,15 @@ const Dashboard = () => {
     <div>
       <Header />
       {
-        loading ? <p>Loading</p> :
+        loading ? <p>Loading...</p> :
           <>
             <Cards 
             income={income}
             expense={expense}
             currentBalance={currentBalance}
             showExpenseModal={showExpenseModal} 
-            showIncomeModal={showIncomeModal} />
+            showIncomeModal={showIncomeModal}
+            fetchTransactions={fetchTransactions} />
 
             {transactions.length > 0 ? <Chart sortedTransaction={sortedTransaction}/>: <NoTransactions />}
 

@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './styles.css';
 import Input from '../Input';
 import Button from '../Button';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from '../../firebase';
+import { auth, db, provider } from '../../firebase';
 import { toast } from 'react-toastify';
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+
 
 const SignupSignin = () => {
+  const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -17,6 +21,19 @@ const SignupSignin = () => {
   const [loadingEmailState, setLoadingEmailState] = useState(false);
   const [loadingGoogleState, setLoadingGoogleState] = useState(false);
   const [loginForm, setLoginForm] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (user && isLoggedIn) {
+      navigate('/dashboard');
+    }
+  }, [user]);
+  useEffect(() => {
+    const flag = JSON.parse(localStorage.getItem('isLoggedIn')) || false;
+    if (flag) {
+      setIsLoggedIn(true);
+    }
+  }, [])
 
   function handleSignUpWithEmail(e) {
     e.preventDefault();
@@ -35,6 +52,7 @@ const SignupSignin = () => {
             setConfirmPassword('');
             // create doc for the user with uid
             createDoc(user);
+            setLoginForm(true);
           })
           .catch((error) => {
             const errorCode = error.code;
@@ -64,6 +82,7 @@ const SignupSignin = () => {
           setEmail('')
           setPassword('');
           navigate('/dashboard');
+          localStorage.setItem('isLoggedIn', JSON.stringify(true));
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -92,7 +111,7 @@ const SignupSignin = () => {
         });
         toast.success('Doc created');
         setLoadingEmailState(false);
-      }else{
+      } else {
         toast.error("Doc already exists");
         setLoadingEmailState(false);
       }
@@ -100,6 +119,55 @@ const SignupSignin = () => {
       toast.error(e.message);
       setLoadingEmailState(false);
     }
+  }
+
+  function SignInUpWithGoogle(e) {
+    e.preventDefault();
+    setLoadingGoogleState(true);
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
+
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+
+        // The signed-in user info.
+        const user = result.user;
+
+        // Get additional user information
+        const isNewUser = result._tokenResponse.isNewUser;
+
+        if (isNewUser) {
+          console.log("Signing up a new user:");
+          console.log("User Info:", user);
+          // Perform sign-up-specific actions here
+          toast.success('user signup successful');
+          setLoadingGoogleState(false);
+          setLoginForm(true);
+        } else {
+          console.log("Logging in an existing user:");
+          console.log("User Info:", user);
+          // Perform login-specific actions here
+          localStorage.setItem('isLoggedIn', JSON.stringify(true));
+          toast.success('user logged in');
+          navigate('/dashboard');
+          setLoadingGoogleState(false);
+        }
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.customData?.email;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+
+        console.error("Error during Google authentication:", errorMessage);
+        setLoadingGoogleState(false);
+        toast.error(errorMessage);
+      });
+
   }
   return (
     <>
@@ -123,7 +191,7 @@ const SignupSignin = () => {
             />
             <Button disabled={loadingEmailState} text={loadingEmailState ? 'Loading...' : 'Login Using Email and Password'} onClick={(e) => { handleLogin(e) }} />
             <p style={{ textAlign: 'center' }}>or</p>
-            <Button disabled={loadingGoogleState} text={loadingGoogleState ? 'Loading...' : 'Login Using Google'} blue={true} />
+            <Button disabled={loadingGoogleState} text={loadingGoogleState ? 'Loading...' : 'Login Using Google'} blue={true} onClick={(e) => { SignInUpWithGoogle(e) }} />
             <p disabled={loadingGoogleState || loadingEmailState} className='p-login' onClick={() => { setLoginForm(!loginForm) }}>Or Don't Have An Account? <span style={{ color: 'var(--theme)' }}>Click Here</span></p>
           </form>
         </div>
@@ -161,7 +229,7 @@ const SignupSignin = () => {
             />
             <Button disabled={loadingEmailState} text={loadingEmailState ? 'Loading...' : 'Signup Using Email and Password'} onClick={(e) => { handleSignUpWithEmail(e) }} />
             <p style={{ textAlign: 'center' }}>or</p>
-            <Button disabled={loadingGoogleState} text={loadingGoogleState ? 'Loading...' : 'Signup Using Google'} blue={true} />
+            <Button disabled={loadingGoogleState} text={loadingGoogleState ? 'Loading...' : 'Signup Using Google'} blue={true} onClick={(e) => { SignInUpWithGoogle(e) }} />
             <p disabled={loadingGoogleState || loadingEmailState} className='p-login' onClick={() => { setLoginForm(!loginForm) }}>Or Already Have An Account? <span style={{ color: 'var(--theme)' }}>Click Here</span></p>
           </form>
         </div>

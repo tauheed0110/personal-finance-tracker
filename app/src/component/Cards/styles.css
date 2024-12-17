@@ -21,3 +21,12 @@
 .ant-card-head-title{
     font-weight: 500;
 }
+
+@media (max-width:900px){
+    .row{
+        gap: 1rem;
+    }
+    .my-card{
+        margin:0rem 2rem;
+    }
+}

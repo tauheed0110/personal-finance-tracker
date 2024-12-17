@@ -1,0 +1,20 @@
+.table-flex-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+.export-import-btn{
+    display: flex;
+    justify-content: center; 
+    gap: 1rem;
+    width: 400px;
+}
+@media (max-width: 900px){
+    .table-flex-row{
+        display: block;
+    }
+    .export-import-btn{
+        justify-content: left;
+    }
+}
